@@ -117,7 +117,7 @@
                 </span>
             </h1>
 
-            <!-- Features Badges (No P* / Q* text on cover) -->
+            <!-- Features Badges -->
             <div class="flex flex-wrap justify-center gap-3 my-6">
                 <span class="px-4 py-2 rounded-xl glass-panel neon-border-cyan text-cyan-300 text-sm font-semibold flex items-center gap-2">
                     ⏰ 60s 限時思考
@@ -131,10 +131,10 @@
             </div>
 
             <p class="max-w-xl mx-auto text-slate-400 text-sm sm:text-base leading-relaxed">
-                挑戰 8 大 DSE 經典考題！精準判斷需求的轉移 (Demand Shift) 與 供應的轉移 (Supply Shift)，掌握 5** 解題邏輯！
+                挑戰 8 大 DSE 經典考題！精準判斷需求的轉移 (Demand Shift)、供應的轉移 (Supply Shift) 及均衡價格 (P*) 的改變，掌握 5** 解題邏輯！
             </p>
 
-            <!-- START BUTTON WITH GUARANTEED NON-BLOCKING AUDIO CALL -->
+            <!-- START BUTTON -->
             <div class="pt-4">
                 <button id="startBtn" onclick="handleStartGame()" class="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-extrabold text-white transition-all duration-300 bg-gradient-to-r from-cyan-500 to-pink-500 rounded-2xl shadow-lg shadow-cyan-500/30 hover:shadow-pink-500/50 hover:scale-105 active:scale-95">
                     <span class="flex items-center gap-3">
@@ -145,10 +145,10 @@
             </div>
         </div>
 
-        <!-- SCREEN 2: GAMEPLAY SCREEN (Hidden initially) -->
+        <!-- SCREEN 2: GAMEPLAY SCREEN -->
         <div id="gameScreen" class="w-full hidden space-y-4">
             
-            <!-- Top Status Bar: Question Count, Score, Timer -->
+            <!-- Top Status Bar -->
             <div class="grid grid-cols-3 gap-3 items-center">
                 <div class="glass-panel p-3 rounded-xl text-center">
                     <div class="text-xs text-slate-400">題目 Progress</div>
@@ -186,7 +186,7 @@
                     ...
                 </p>
                 
-                <!-- Hint Modal / Notification Drawer -->
+                <!-- Hint Modal -->
                 <div id="hintBox" class="hidden mt-3 p-3 bg-amber-950/60 border border-amber-500/50 rounded-xl text-amber-200 text-xs sm:text-sm animate-fade-in">
                     <div class="font-bold mb-1 flex items-center gap-2">
                         <span>😊 朱sir 的啟發式提示：</span>
@@ -210,11 +210,12 @@
 
                 <!-- Control Buttons Section -->
                 <div class="space-y-3 flex flex-col justify-center">
-                    <div class="text-xs font-semibold text-slate-400 px-1 flex items-center gap-1">
+                    <div id="controlTitle" class="text-xs font-semibold text-slate-400 px-1 flex items-center gap-1">
                         <span>🎯 請選擇市場變動的方向：</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-3" id="actionGrid">
+                        <!-- Standard D/S shift buttons (Questions 1-7) -->
                         <button onclick="handleAnswer('D_RIGHT')" id="btnDRight" class="action-btn p-4 rounded-xl glass-panel border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
                             <span class="text-base sm:text-lg">需求增加</span>
                             <span class="text-xs text-slate-400 font-mono">(D 右移) ↗️</span>
@@ -236,6 +237,29 @@
                         </button>
                     </div>
 
+                    <!-- Price options for Question 8 -->
+                    <div class="grid grid-cols-2 gap-3 hidden" id="priceGrid">
+                        <button onclick="handleAnswer('P_UP')" id="btnPUp" class="action-btn p-4 rounded-xl glass-panel border border-amber-500/40 hover:bg-amber-500/20 text-amber-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
+                            <span class="text-lg">上升</span>
+                            <span class="text-xs text-slate-400 font-mono">⬆️ P* 上升</span>
+                        </button>
+
+                        <button onclick="handleAnswer('P_DOWN')" id="btnPDown" class="action-btn p-4 rounded-xl glass-panel border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
+                            <span class="text-lg">下降</span>
+                            <span class="text-xs text-slate-400 font-mono">⬇️ P* 下降</span>
+                        </button>
+
+                        <button onclick="handleAnswer('P_SAME')" id="btnPSame" class="action-btn p-4 rounded-xl glass-panel border border-slate-500/40 hover:bg-slate-500/20 text-slate-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
+                            <span class="text-lg">不變</span>
+                            <span class="text-xs text-slate-400 font-mono">➡️ P* 不變</span>
+                        </button>
+
+                        <button onclick="handleAnswer('P_UNCERTAIN')" id="btnPUncertain" class="action-btn p-4 rounded-xl glass-panel border border-pink-500/40 hover:bg-pink-500/20 text-pink-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
+                            <span class="text-lg">不確定</span>
+                            <span class="text-xs text-slate-400 font-mono">❓ 無法確定</span>
+                        </button>
+                    </div>
+
                     <!-- Answer Feedback Card -->
                     <div id="feedbackCard" class="hidden p-3 rounded-xl text-center font-bold text-sm transition-all duration-300">
                         <div id="feedbackText">---</div>
@@ -249,7 +273,7 @@
 
         </div>
 
-        <!-- SCREEN 3: RESULT & DIAGNOSTIC REPORT (Hidden initially) -->
+        <!-- SCREEN 3: RESULT & DIAGNOSTIC REPORT -->
         <div id="resultScreen" class="w-full hidden space-y-6 py-6">
             <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-cyan-500/30 text-center space-y-6">
                 
@@ -301,15 +325,12 @@
 
     <script>
         /* --------------------------------------------------
-         * SOUND & AUDIO SYSTEM (Web Audio API - Non-blocking)
+         * SOUND & AUDIO SYSTEM (Web Audio API)
          * -------------------------------------------------- */
         let audioCtx = null;
         let isMuted = false;
-        let bgmOscillator = null;
-        let bgmGain = null;
         let bgmInterval = null;
 
-        // Initialize audio safely inside a user event handler
         function initAudio() {
             if (audioCtx) return;
             try {
@@ -329,12 +350,8 @@
             isMuted = !isMuted;
             document.getElementById('muteIcon').innerText = isMuted ? '🔇' : '🔊';
             document.getElementById('muteText').innerText = isMuted ? '音效已靜音' : '音效已開啟';
-            if (isMuted && bgmGain) {
-                bgmGain.gain.setValueAtTime(0, audioCtx ? audioCtx.currentTime : 0);
-            }
         }
 
-        // Play synthetic SFX safely
         function playSFX(type) {
             if (isMuted || !audioCtx) return;
             try {
@@ -346,15 +363,15 @@
 
                 if (type === 'correct') {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(523.25, now); // C5
-                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.2); // A5
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
                     osc.start(now);
                     osc.stop(now + 0.25);
                 } else if (type === 'wrong') {
                     osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(220, now); // A3
+                    osc.frequency.setValueAtTime(220, now);
                     osc.frequency.setValueAtTime(140, now + 0.1);
                     gain.gain.setValueAtTime(0.2, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
@@ -374,12 +391,11 @@
             }
         }
 
-        // Start simple Cyberpunk Synthwave BGM Loop
         function startBGM() {
             if (!audioCtx || bgmInterval) return;
             try {
                 let noteIndex = 0;
-                const notes = [110, 110, 130.81, 110, 146.83, 110, 130.81, 98]; // A2 bassline synth pattern
+                const notes = [110, 110, 130.81, 110, 146.83, 110, 130.81, 98];
 
                 bgmInterval = setInterval(() => {
                     if (isMuted || !audioCtx) return;
@@ -414,7 +430,7 @@
         }
 
         /* --------------------------------------------------
-         * GAME DATA: DSE SYLLABUS QUESTIONS (8 Topics)
+         * GAME DATA: DSE SYLLABUS QUESTIONS
          * -------------------------------------------------- */
         const questions = [
             {
@@ -457,7 +473,7 @@
                 id: 5,
                 tag: "考點: 所得與常規物品 (Income & Normal Goods)",
                 title: "5. 全民發放電子消費券",
-                desc: "政府向全港居民發放 $10,000 電子消費券，市民市民可支配收入增加。對「常規物品 (Normal Goods)」市場有何影響？",
+                desc: "政府向全港居民發放 $10,000 電子消費券，市民可支配收入增加。對「常規物品 (Normal Goods)」市場有何影響？",
                 correctAction: "D_RIGHT",
                 hint: "常規物品的定義：當收入 (Income) 增加時，對該物品的買意（需求）會上升還是下降？",
                 topic: "收入變動對常規物品之影響"
@@ -484,10 +500,10 @@
                 id: 8,
                 tag: "考點: 5** 終極高階題 (Combined Shift)",
                 title: "8. 汽油進口稅上升 + 汽車出行需求急增",
-                desc: "政府大幅提高汽油進口稅 (S左移)，同時旅遊復甦導致汽車出行及汽油需求急增 (D右移)。對汽油均衡價格 P* 有何必然影響？",
-                correctAction: "D_RIGHT", // Primary focus on Demand Shift logic test or combined shift direction
-                hint: "【5** 高階啟發】：D 右移會推高價格，S 左移也會推高價格！兩者同時發生時，均衡價格 (P*) 必然大幅上升！請選擇導致價格上升的需求變動或供應變動方向（本題核心驗證需求增加與供應減少的共同作用）。",
-                topic: "複合移位與均衡點 (Combined Shift)"
+                desc: "政府大幅提高汽油進口稅（導致供應減少/S左移），同時旅遊復甦導致汽車出行及汽油需求急增（導致需求增加/D右移）。請問汽油的均衡價格 (P*) 會發生什麼改變？",
+                correctAction: "P_UP",
+                hint: "【5** 高階啟發】：D 右移（需求增加）會推高價格 P*；S 左移（供應減少）也會推高價格 P*！當兩個改變同時發生時，均衡價格 P* 必然會怎樣？",
+                topic: "複合移位對均衡價格 (P*) 之影響"
             }
         ];
 
@@ -501,31 +517,26 @@
         let hasAnswered = false;
         let userAnswers = [];
 
-        // Animation state for canvas graph shift
         let animProgress = 0.0;
         let isAnimating = false;
-        let targetShift = { type: '', direction: 0 }; // e.g. { type: 'D', direction: 1 }
+        let targetShift = { type: '', direction: 0 };
 
         /* --------------------------------------------------
-         * START GAME HANDLER (100% Reliable non-blocking)
+         * START GAME HANDLER
          * -------------------------------------------------- */
         function handleStartGame() {
-            // 1. Initialize audio non-blockingly
             initAudio();
             startBGM();
 
-            // 2. Hide Cover, Show Game Screen
             document.getElementById('coverScreen').classList.add('hidden');
             document.getElementById('gameScreen').classList.remove('hidden');
 
-            // 3. Reset State & Load First Question
             currentQIndex = 0;
             score = 0;
             userAnswers = [];
             
             loadQuestion(currentQIndex);
             
-            // 4. Force Canvas Resize & Initial Render
             setTimeout(() => {
                 resizeCanvas();
             }, 50);
@@ -547,21 +558,31 @@
             document.getElementById('qTitle').innerText = q.title;
             document.getElementById('qDesc').innerText = q.desc;
             
-            // Hide hint and feedback
             document.getElementById('hintBox').classList.add('hidden');
             document.getElementById('feedbackCard').classList.add('hidden');
 
-            // Enable buttons
+            // Switch UI Buttons for Question 8
+            const actionGrid = document.getElementById('actionGrid');
+            const priceGrid = document.getElementById('priceGrid');
+            const controlTitle = document.getElementById('controlTitle');
+
+            if (q.id === 8) {
+                actionGrid.classList.add('hidden');
+                priceGrid.classList.remove('hidden');
+                controlTitle.innerHTML = '<span>🎯 請選擇均衡價格 P* 的改變：</span>';
+            } else {
+                actionGrid.classList.remove('hidden');
+                priceGrid.classList.add('hidden');
+                controlTitle.innerHTML = '<span>🎯 請選擇市場變動的方向：</span>';
+            }
+
             toggleActionButtons(true);
 
-            // Reset legend
             document.getElementById('canvasLegend').innerText = "初始狀態：D1 與 S1 處於均衡點 E1 (等待作答)";
             document.getElementById('canvasLegend').className = "text-center text-xs text-slate-400 mt-2 font-mono";
 
-            // Draw Initial Graph state (No shift preview beforehand!)
             drawGraph(0, '', 0);
 
-            // Start 60s Timer
             startTimer();
         }
 
@@ -606,14 +627,16 @@
         }
 
         function toggleActionButtons(enabled) {
-            const btns = ['btnDRight', 'btnDLeft', 'btnSRight', 'btnSLeft'];
+            const btns = ['btnDRight', 'btnDLeft', 'btnSRight', 'btnSLeft', 'btnPUp', 'btnPDown', 'btnPSame', 'btnPUncertain'];
             btns.forEach(id => {
                 const btn = document.getElementById(id);
-                btn.disabled = !enabled;
-                if (enabled) {
-                    btn.classList.remove('opacity-40', 'cursor-not-allowed');
-                } else {
-                    btn.classList.add('opacity-40', 'cursor-not-allowed');
+                if (btn) {
+                    btn.disabled = !enabled;
+                    if (enabled) {
+                        btn.classList.remove('opacity-40', 'cursor-not-allowed');
+                    } else {
+                        btn.classList.add('opacity-40', 'cursor-not-allowed');
+                    }
                 }
             });
         }
@@ -627,9 +650,8 @@
             clearInterval(timerInterval);
 
             const q = questions[currentQIndex];
-            const isCorrect = (selectedAction === q.correctAction) || (q.id === 8 && (selectedAction === 'D_RIGHT' || selectedAction === 'S_LEFT'));
+            const isCorrect = (selectedAction === q.correctAction);
 
-            // Store user performance
             userAnswers.push({
                 questionId: q.id,
                 topic: q.topic,
@@ -638,10 +660,8 @@
                 correct: q.correctAction
             });
 
-            // Disable buttons
             toggleActionButtons(false);
 
-            // Audio & Score
             if (isCorrect) {
                 playSFX('correct');
                 const speedBonus = Math.round(timer * 2);
@@ -655,9 +675,7 @@
                 showFeedback(false, `❌ 答錯了！正確答案應為：${getActionLabel(q.correctAction)}`);
             }
 
-            // Setup and Trigger Curve Shift Animation AFTER answering
-            const actionToShift = isCorrect ? selectedAction : q.correctAction;
-            setupCurveAnimation(actionToShift);
+            setupCurveAnimation(q.id === 8 ? 'COMBINED' : selectedAction);
         }
 
         function handleTimeOut() {
@@ -675,7 +693,7 @@
             });
 
             showFeedback(false, `⏰ 時間到！正確答案應為：${getActionLabel(q.correctAction)}`);
-            setupCurveAnimation(q.correctAction);
+            setupCurveAnimation(q.id === 8 ? 'COMBINED' : q.correctAction);
         }
 
         function getActionLabel(action) {
@@ -684,6 +702,10 @@
                 case 'D_LEFT': return '需求減少 (D 左移)';
                 case 'S_RIGHT': return '供應增加 (S 右移)';
                 case 'S_LEFT': return '供應減少 (S 左移)';
+                case 'P_UP': return '上升 (P* 上升)';
+                case 'P_DOWN': return '下降 (P* 下降)';
+                case 'P_SAME': return '不變 (P* 不變)';
+                case 'P_UNCERTAIN': return '不確定 (P* 無法確定)';
                 default: return '';
             }
         }
@@ -704,9 +726,12 @@
 
         function setupCurveAnimation(action) {
             let curveType = 'D';
-            let dir = 1; // 1 for right, -1 for left
+            let dir = 1;
 
-            if (action === 'D_RIGHT') { curveType = 'D'; dir = 1; }
+            if (action === 'COMBINED') {
+                curveType = 'COMBINED';
+                dir = 1;
+            } else if (action === 'D_RIGHT') { curveType = 'D'; dir = 1; }
             else if (action === 'D_LEFT') { curveType = 'D'; dir = -1; }
             else if (action === 'S_RIGHT') { curveType = 'S'; dir = 1; }
             else if (action === 'S_LEFT') { curveType = 'S'; dir = -1; }
@@ -715,7 +740,11 @@
             animProgress = 0.0;
             isAnimating = true;
 
-            document.getElementById('canvasLegend').innerText = `動態移位中：${curveType} 線向 ${dir > 0 ? '右' : '左'} 移動 ➔ 形成新均衡點 E2`;
+            if (curveType === 'COMBINED') {
+                document.getElementById('canvasLegend').innerText = `雙重移位：D 右移 + S 左移 ➔ 均衡價格 P* 必然上升至 P2!`;
+            } else {
+                document.getElementById('canvasLegend').innerText = `動態移位中：${curveType} 線向 ${dir > 0 ? '右' : '左'} 移動 ➔ 形成新均衡點 E2`;
+            }
             document.getElementById('canvasLegend').className = "text-center text-xs text-cyan-300 mt-2 font-mono font-bold animate-pulse";
 
             animateCurve();
@@ -764,29 +793,23 @@
             const w = canvas.width;
             const h = canvas.height;
             
-            // Clear background
             ctx.clearRect(0, 0, w, h);
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(0, 0, w, h);
 
-            // Margin & Axes
             const margin = { top: 30, right: 30, bottom: 40, left: 45 };
             const graphW = w - margin.left - margin.right;
             const graphH = h - margin.top - margin.bottom;
 
-            // Draw grid lines
             ctx.strokeStyle = '#1e293b';
             ctx.lineWidth = 1;
             for (let i = 1; i <= 4; i++) {
-                // Horizontal grid
                 const y = margin.top + (graphH / 5) * i;
                 ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(w - margin.right, y); ctx.stroke();
-                // Vertical grid
                 const x = margin.left + (graphW / 5) * i;
                 ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, h - margin.bottom); ctx.stroke();
             }
 
-            // Draw Axes
             ctx.strokeStyle = '#94a3b8';
             ctx.lineWidth = 2 * (w / 400);
             ctx.beginPath();
@@ -795,127 +818,124 @@
             ctx.lineTo(w - margin.right, h - margin.bottom);
             ctx.stroke();
 
-            // Axis Labels (P and Q)
             ctx.fillStyle = '#f8fafc';
             ctx.font = `bold ${Math.max(12, Math.round(w / 30))}px Orbitron, sans-serif`;
             ctx.fillText('P (價格)', margin.left - 35, margin.top + 10);
             ctx.fillText('Q (數量)', w - margin.right - 40, h - margin.bottom + 30);
 
-            // Base Curves Coordinates
-            // D1: Downward sloping line from (0.1, 0.1) to (0.9, 0.9)
-            // S1: Upward sloping line from (0.1, 0.9) to (0.9, 0.1)
             const d1_start = { x: margin.left + graphW * 0.15, y: margin.top + graphH * 0.15 };
             const d1_end   = { x: margin.left + graphW * 0.85, y: margin.top + graphH * 0.85 };
 
             const s1_start = { x: margin.left + graphW * 0.15, y: margin.top + graphH * 0.85 };
             const s1_end   = { x: margin.left + graphW * 0.85, y: margin.top + graphH * 0.15 };
 
-            // Draw Base Curve D1
-            ctx.strokeStyle = '#06b6d4'; // Cyan for Demand
+            ctx.strokeStyle = '#06b6d4';
             ctx.lineWidth = 3 * (w / 400);
             ctx.beginPath();
             ctx.moveTo(d1_start.x, d1_start.y);
             ctx.lineTo(d1_end.x, d1_end.y);
             ctx.stroke();
 
-            // Label D1
             ctx.fillStyle = '#06b6d4';
             ctx.fillText('D1', d1_end.x + 5, d1_end.y + 5);
 
-            // Draw Base Curve S1
-            ctx.strokeStyle = '#ec4899'; // Pink for Supply
+            ctx.strokeStyle = '#ec4899';
             ctx.lineWidth = 3 * (w / 400);
             ctx.beginPath();
             ctx.moveTo(s1_start.x, s1_start.y);
             ctx.lineTo(s1_end.x, s1_end.y);
             ctx.stroke();
 
-            // Label S1
             ctx.fillStyle = '#ec4899';
             ctx.fillText('S1', s1_end.x + 5, s1_end.y - 5);
 
-            // Initial Equilibrium E1 (Intersection of D1 and S1)
             const e1 = { x: margin.left + graphW * 0.5, y: margin.top + graphH * 0.5 };
             
-            // Draw Equilibrium E1 point
             ctx.fillStyle = '#f59e0b';
             ctx.beginPath();
             ctx.arc(e1.x, e1.y, 5 * (w / 400), 0, Math.PI * 2);
             ctx.fill();
             ctx.fillText('E1', e1.x - 15, e1.y - 10);
 
-            // Shift Animation Calculations
             if (progress > 0 && shiftType !== '') {
                 const shiftDist = graphW * 0.22 * progress * shiftDir;
 
                 let e2 = { ...e1 };
 
-                if (shiftType === 'D') {
+                if (shiftType === 'COMBINED') {
+                    // D Right + S Left for Question 8
+                    const dShift = graphW * 0.18 * progress;
+                    const sShift = -graphW * 0.18 * progress;
+
                     // Shifted D2
+                    const d2_start = { x: d1_start.x + dShift, y: d1_start.y };
+                    const d2_end   = { x: d1_end.x + dShift, y: d1_end.y };
+                    ctx.strokeStyle = '#22d3ee';
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath(); ctx.moveTo(d2_start.x, d2_start.y); ctx.lineTo(d2_end.x, d2_end.y); ctx.stroke();
+                    ctx.fillStyle = '#22d3ee'; ctx.fillText('D2', d2_end.x + 5, d2_end.y + 5);
+
+                    // Shifted S2
+                    const s2_start = { x: s1_start.x + sShift, y: s1_start.y };
+                    const s2_end   = { x: s1_end.x + sShift, y: s1_end.y };
+                    ctx.strokeStyle = '#f472b6';
+                    ctx.beginPath(); ctx.moveTo(s2_start.x, s2_start.y); ctx.lineTo(s2_end.x, s2_end.y); ctx.stroke();
+                    ctx.fillStyle = '#f472b6'; ctx.fillText('S2', s2_end.x + 5, s2_end.y - 5);
+                    ctx.setLineDash([]);
+
+                    // Combined E2: Price increases distinctly!
+                    e2.x = e1.x; // Quantity change depends on magnitude, Price strictly goes UP
+                    e2.y = e1.y - graphH * 0.22 * progress;
+
+                } else if (shiftType === 'D') {
                     const d2_start = { x: d1_start.x + shiftDist, y: d1_start.y };
                     const d2_end   = { x: d1_end.x + shiftDist, y: d1_end.y };
 
                     ctx.strokeStyle = '#22d3ee';
                     ctx.setLineDash([5, 5]);
-                    ctx.beginPath();
-                    ctx.moveTo(d2_start.x, d2_start.y);
-                    ctx.lineTo(d2_end.x, d2_end.y);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(d2_start.x, d2_start.y); ctx.lineTo(d2_end.x, d2_end.y); ctx.stroke();
                     ctx.setLineDash([]);
 
                     ctx.fillStyle = '#22d3ee';
                     ctx.fillText('D2', d2_end.x + 5, d2_end.y + 5);
 
-                    // E2 calculation for D shift
                     e2.x = e1.x + shiftDist / 2;
                     e2.y = e1.y - shiftDist / 2;
 
-                    // Draw Shift Arrow
                     drawArrow(ctx, d1_start.x + graphW*0.2, d1_start.y + graphH*0.2, d1_start.x + graphW*0.2 + shiftDist, d1_start.y + graphH*0.2, '#06b6d4');
 
                 } else if (shiftType === 'S') {
-                    // Shifted S2
                     const s2_start = { x: s1_start.x + shiftDist, y: s1_start.y };
                     const s2_end   = { x: s1_end.x + shiftDist, y: s1_end.y };
 
                     ctx.strokeStyle = '#f472b6';
                     ctx.setLineDash([5, 5]);
-                    ctx.beginPath();
-                    ctx.moveTo(s2_start.x, s2_start.y);
-                    ctx.lineTo(s2_end.x, s2_end.y);
-                    ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(s2_start.x, s2_start.y); ctx.lineTo(s2_end.x, s2_end.y); ctx.stroke();
                     ctx.setLineDash([]);
 
                     ctx.fillStyle = '#f472b6';
                     ctx.fillText('S2', s2_end.x + 5, s2_end.y - 5);
 
-                    // E2 calculation for S shift
                     e2.x = e1.x + shiftDist / 2;
                     e2.y = e1.y + shiftDist / 2;
 
-                    // Draw Shift Arrow
                     drawArrow(ctx, s1_start.x + graphW*0.2, s1_start.y - graphH*0.2, s1_start.x + graphW*0.2 + shiftDist, s1_start.y - graphH*0.2, '#ec4899');
                 }
 
-                // Draw New Equilibrium E2 Point
                 ctx.fillStyle = '#38bdf8';
                 ctx.beginPath();
                 ctx.arc(e2.x, e2.y, 6 * (w / 400), 0, Math.PI * 2);
                 ctx.fill();
                 ctx.fillText('E2', e2.x + 10, e2.y - 10);
 
-                // Dashed Equilibrium Price & Quantity Lines for E2
                 ctx.strokeStyle = '#64748b';
                 ctx.setLineDash([3, 3]);
-                // P* line
                 ctx.beginPath(); ctx.moveTo(margin.left, e2.y); ctx.lineTo(e2.x, e2.y); ctx.stroke();
-                // Q* line
                 ctx.beginPath(); ctx.moveTo(e2.x, h - margin.bottom); ctx.lineTo(e2.x, e2.y); ctx.stroke();
                 ctx.setLineDash([]);
             }
         }
 
-        // Helper function to draw directional arrows
         function drawArrow(context, fromx, fromy, tox, toy, color) {
             const headlen = 8;
             const dx = tox - fromx;
@@ -945,7 +965,6 @@
 
             document.getElementById('finalScore').innerText = `${score} pts`;
 
-            // Calculate Grade Level
             let grade = 'Level 1';
             if (score >= 900) grade = 'Level 5**';
             else if (score >= 750) grade = 'Level 5*';
@@ -956,7 +975,6 @@
 
             document.getElementById('finalGrade').innerText = grade;
 
-            // Generate Weakness Analysis List
             const analysisList = document.getElementById('analysisList');
             analysisList.innerHTML = '';
 
