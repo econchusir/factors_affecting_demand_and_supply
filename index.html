@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>市場風暴戰 Market Storm: DSE Demand & Supply Challenge</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+TC:wght@400;600;800&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Glassmorphism styles */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .neon-border-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.2);
+            border: 1px solid rgba(6, 182, 212, 0.6);
+        }
+
+        .neon-border-pink {
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.4), inset 0 0 15px rgba(236, 72, 153, 0.2);
+            border: 1px solid rgba(236, 72, 153, 0.6);
+        }
+
+        .neon-text-cyan {
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.8);
+        }
+
+        .neon-text-pink {
+            text-shadow: 0 0 8px rgba(236, 72, 153, 0.8);
+        }
+
+        .action-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Canvas container aspect ratio */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            padding-top: 75%; /* 4:3 Aspect Ratio */
+        }
+
+        .canvas-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative bg-slate-950 text-slate-100 selection:bg-pink-500 selection:text-white">
+
+    <!-- Floating Cyberpunk Particles Background -->
+    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Top Navigation Bar -->
+    <header class="relative z-10 w-full p-4 glass-panel border-b border-slate-800">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">⚡</span>
+                <h1 class="font-orbitron text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">
+                    MARKET STORM DSE
+                </h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button id="muteBtn" onclick="toggleMute()" class="px-3 py-1.5 rounded-lg glass-panel hover:bg-slate-800 transition text-sm flex items-center gap-2">
+                    <span id="muteIcon">🔊</span>
+                    <span id="muteText" class="hidden sm:inline text-xs text-slate-300">音效已開啟</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 flex-1 flex flex-col justify-center items-center p-4 max-w-5xl mx-auto w-full">
+
+        <!-- SCREEN 1: COVER SCREEN -->
+        <div id="coverScreen" class="w-full text-center space-y-6 py-8">
+            <div class="inline-block p-2 rounded-full glass-panel mb-2">
+                <span class="text-xs font-bold uppercase tracking-widest px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full border border-cyan-500/30">
+                    HK DSE Economics Challenge
+                </span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+                <span class="block text-slate-100 mb-1">市場風暴戰</span>
+                <span class="font-orbitron bg-gradient-to-r from-cyan-400 via-pink-400 to-amber-400 bg-clip-text text-transparent text-2xl sm:text-4xl">
+                    Demand & Supply Challenge
+                </span>
+            </h1>
+
+            <!-- Features Badges (No P* / Q* text on cover) -->
+            <div class="flex flex-wrap justify-center gap-3 my-6">
+                <span class="px-4 py-2 rounded-xl glass-panel neon-border-cyan text-cyan-300 text-sm font-semibold flex items-center gap-2">
+                    ⏰ 60s 限時思考
+                </span>
+                <span class="px-4 py-2 rounded-xl glass-panel text-amber-300 text-sm font-semibold flex items-center gap-2 border border-amber-500/30">
+                    😊 朱sir 貼士 😊
+                </span>
+                <span class="px-4 py-2 rounded-xl glass-panel neon-border-pink text-pink-300 text-sm font-semibold flex items-center gap-2">
+                    📈 Canvas 雙曲線
+                </span>
+            </div>
+
+            <p class="max-w-xl mx-auto text-slate-400 text-sm sm:text-base leading-relaxed">
+                挑戰 8 大 DSE 經典考題！精準判斷需求的轉移 (Demand Shift) 與 供應的轉移 (Supply Shift)，掌握 5** 解題邏輯！
+            </p>
+
+            <!-- START BUTTON WITH GUARANTEED NON-BLOCKING AUDIO CALL -->
+            <div class="pt-4">
+                <button id="startBtn" onclick="handleStartGame()" class="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-extrabold text-white transition-all duration-300 bg-gradient-to-r from-cyan-500 to-pink-500 rounded-2xl shadow-lg shadow-cyan-500/30 hover:shadow-pink-500/50 hover:scale-105 active:scale-95">
+                    <span class="flex items-center gap-3">
+                        <span>開始挑戰</span>
+                        <span class="text-2xl transition-transform group-hover:translate-x-1">🚀</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: GAMEPLAY SCREEN (Hidden initially) -->
+        <div id="gameScreen" class="w-full hidden space-y-4">
+            
+            <!-- Top Status Bar: Question Count, Score, Timer -->
+            <div class="grid grid-cols-3 gap-3 items-center">
+                <div class="glass-panel p-3 rounded-xl text-center">
+                    <div class="text-xs text-slate-400">題目 Progress</div>
+                    <div class="font-orbitron font-bold text-cyan-400 text-base sm:text-lg" id="qProgress">1 / 8</div>
+                </div>
+                <div class="glass-panel p-3 rounded-xl text-center">
+                    <div class="text-xs text-slate-400">得分 Score</div>
+                    <div class="font-orbitron font-bold text-pink-400 text-base sm:text-lg" id="scoreDisplay">0</div>
+                </div>
+                <div class="glass-panel p-3 rounded-xl text-center">
+                    <div class="text-xs text-slate-400">剩餘時間 Time</div>
+                    <div class="font-orbitron font-bold text-amber-400 text-base sm:text-lg" id="timerDisplay">60.0s</div>
+                </div>
+            </div>
+
+            <!-- Animated Timer Progress Bar -->
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                <div id="timerBar" class="h-full bg-gradient-to-r from-cyan-400 to-amber-400 rounded-full transition-all duration-100 ease-linear w-full"></div>
+            </div>
+
+            <!-- Question Scenario Card -->
+            <div class="glass-panel p-4 sm:p-6 rounded-2xl border border-cyan-500/20 relative">
+                <div class="flex items-center justify-between mb-2">
+                    <span id="qTag" class="text-xs font-bold px-2.5 py-1 bg-pink-500/20 text-pink-300 rounded-md border border-pink-500/30">
+                        考點: ---
+                    </span>
+                    <button onclick="showHint()" class="text-xs font-bold px-3 py-1.5 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 rounded-lg border border-amber-500/40 flex items-center gap-1 transition">
+                        😊 朱sir 貼士 😊
+                    </button>
+                </div>
+                <h3 id="qTitle" class="text-base sm:text-lg font-bold text-slate-100 mb-2">
+                    題目載入中...
+                </h3>
+                <p id="qDesc" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    ...
+                </p>
+                
+                <!-- Hint Modal / Notification Drawer -->
+                <div id="hintBox" class="hidden mt-3 p-3 bg-amber-950/60 border border-amber-500/50 rounded-xl text-amber-200 text-xs sm:text-sm animate-fade-in">
+                    <div class="font-bold mb-1 flex items-center gap-2">
+                        <span>😊 朱sir 的啟發式提示：</span>
+                    </div>
+                    <div id="hintText">提示內容...</div>
+                </div>
+            </div>
+
+            <!-- Interactive Graph Canvas + Control Panel Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                
+                <!-- Canvas Section -->
+                <div class="glass-panel p-3 rounded-2xl border border-slate-800">
+                    <div class="canvas-container rounded-xl overflow-hidden bg-slate-900/90 border border-slate-800">
+                        <canvas id="marketCanvas"></canvas>
+                    </div>
+                    <div id="canvasLegend" class="text-center text-xs text-slate-400 mt-2 font-mono">
+                        初始狀態：D1 與 S1 處於均衡點 E1
+                    </div>
+                </div>
+
+                <!-- Control Buttons Section -->
+                <div class="space-y-3 flex flex-col justify-center">
+                    <div class="text-xs font-semibold text-slate-400 px-1 flex items-center gap-1">
+                        <span>🎯 請選擇市場變動的方向：</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="handleAnswer('D_RIGHT')" id="btnDRight" class="action-btn p-4 rounded-xl glass-panel border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
+                            <span class="text-base sm:text-lg">需求增加</span>
+                            <span class="text-xs text-slate-400 font-mono">(D 右移) ↗️</span>
+                        </button>
+
+                        <button onclick="handleAnswer('D_LEFT')" id="btnDLeft" class="action-btn p-4 rounded-xl glass-panel border border-cyan-500/40 hover:bg-cyan-500/20 text-cyan-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
+                            <span class="text-base sm:text-lg">需求減少</span>
+                            <span class="text-xs text-slate-400 font-mono">(D 左移) ↙️</span>
+                        </button>
+
+                        <button onclick="handleAnswer('S_RIGHT')" id="btnSRight" class="action-btn p-4 rounded-xl glass-panel border border-pink-500/40 hover:bg-pink-500/20 text-pink-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
+                            <span class="text-base sm:text-lg">供應增加</span>
+                            <span class="text-xs text-slate-400 font-mono">(S 右移) ↘️</span>
+                        </button>
+
+                        <button onclick="handleAnswer('S_LEFT')" id="btnSLeft" class="action-btn p-4 rounded-xl glass-panel border border-pink-500/40 hover:bg-pink-500/20 text-pink-300 font-bold text-center flex flex-col items-center justify-center space-y-1">
+                            <span class="text-base sm:text-lg">供應減少</span>
+                            <span class="text-xs text-slate-400 font-mono">(S 左移) ↖️</span>
+                        </button>
+                    </div>
+
+                    <!-- Answer Feedback Card -->
+                    <div id="feedbackCard" class="hidden p-3 rounded-xl text-center font-bold text-sm transition-all duration-300">
+                        <div id="feedbackText">---</div>
+                        <button id="nextBtn" onclick="nextQuestion()" class="mt-2 w-full py-2 bg-gradient-to-r from-cyan-500 to-pink-500 text-white rounded-lg font-bold text-xs hover:opacity-90 transition">
+                            下一題 Next Question ➔
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SCREEN 3: RESULT & DIAGNOSTIC REPORT (Hidden initially) -->
+        <div id="resultScreen" class="w-full hidden space-y-6 py-6">
+            <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-cyan-500/30 text-center space-y-6">
+                
+                <div class="inline-block p-3 rounded-full bg-cyan-500/10 border border-cyan-500/30 mb-2">
+                    <span class="text-3xl">🎓</span>
+                </div>
+
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-100">
+                    DSE 戰績診斷報告 Diagnostic Report
+                </h2>
+
+                <!-- Final Score & Grade Display -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+                    <div class="glass-panel p-4 rounded-xl border border-slate-700">
+                        <div class="text-xs text-slate-400">最終得分 Final Score</div>
+                        <div id="finalScore" class="font-orbitron text-3xl font-bold text-cyan-400 mt-1">0 / 800</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border border-slate-700">
+                        <div class="text-xs text-slate-400">評定 DSE 等級 Estimated Level</div>
+                        <div id="finalGrade" class="font-orbitron text-3xl font-bold text-pink-400 mt-1">Level 5**</div>
+                    </div>
+                </div>
+
+                <!-- Weakness & Revision Suggestions -->
+                <div class="text-left bg-slate-900/80 p-4 sm:p-5 rounded-xl border border-slate-800 space-y-3">
+                    <h4 class="text-sm font-bold text-amber-300 flex items-center gap-2">
+                        <span>📊 朱sir Paper 1 複習建議與漏洞分析：</span>
+                    </h4>
+                    <ul id="analysisList" class="text-xs sm:text-sm text-slate-300 space-y-2 list-disc list-inside">
+                        <!-- Dynamic analysis items -->
+                    </ul>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="restartGame()" class="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-pink-500 text-white rounded-xl font-extrabold text-base shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition">
+                        重新挑戰 Restart Challenge 🔄
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 w-full p-3 text-center text-xs text-slate-500 glass-panel border-t border-slate-800">
+        HK DSE Economics Interactive Learning Tool &bull; Designed for DSE Candidates
+    </footer>
+
+    <script>
+        /* --------------------------------------------------
+         * SOUND & AUDIO SYSTEM (Web Audio API - Non-blocking)
+         * -------------------------------------------------- */
+        let audioCtx = null;
+        let isMuted = false;
+        let bgmOscillator = null;
+        let bgmGain = null;
+        let bgmInterval = null;
+
+        // Initialize audio safely inside a user event handler
+        function initAudio() {
+            if (audioCtx) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                }
+            } catch (e) {
+                console.warn("Web Audio API not supported or blocked:", e);
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteIcon').innerText = isMuted ? '🔇' : '🔊';
+            document.getElementById('muteText').innerText = isMuted ? '音效已靜音' : '音效已開啟';
+            if (isMuted && bgmGain) {
+                bgmGain.gain.setValueAtTime(0, audioCtx ? audioCtx.currentTime : 0);
+            }
+        }
+
+        // Play synthetic SFX safely
+        function playSFX(type) {
+            if (isMuted || !audioCtx) return;
+            try {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.2); // A5
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now); // A3
+                    osc.frequency.setValueAtTime(140, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'hint') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }
+            } catch (e) {
+                console.warn("SFX error:", e);
+            }
+        }
+
+        // Start simple Cyberpunk Synthwave BGM Loop
+        function startBGM() {
+            if (!audioCtx || bgmInterval) return;
+            try {
+                let noteIndex = 0;
+                const notes = [110, 110, 130.81, 110, 146.83, 110, 130.81, 98]; // A2 bassline synth pattern
+
+                bgmInterval = setInterval(() => {
+                    if (isMuted || !audioCtx) return;
+                    try {
+                        const now = audioCtx.currentTime;
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        const filter = audioCtx.createBiquadFilter();
+
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(notes[noteIndex % notes.length], now);
+
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(400, now);
+
+                        gain.gain.setValueAtTime(0.03, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+                        osc.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(audioCtx.destination);
+
+                        osc.start(now);
+                        osc.stop(now + 0.2);
+
+                        noteIndex++;
+                    } catch(err) {}
+                }, 250);
+            } catch(e) {
+                console.warn("BGM start failed:", e);
+            }
+        }
+
+        /* --------------------------------------------------
+         * GAME DATA: DSE SYLLABUS QUESTIONS (8 Topics)
+         * -------------------------------------------------- */
+        const questions = [
+            {
+                id: 1,
+                tag: "考點: 生產成本 (Production Cost)",
+                title: "1. 「勝宏」手搖飲品店事件",
+                desc: "勝宏開設了一間手搖飲品店。近期店舖租金及員工工資大幅上升。假設手搖飲品市場為完全競爭，這對手搖飲品市場有何直接影響？",
+                correctAction: "S_LEFT",
+                hint: "租金與工資屬於生產成本 (Cost of Production)。成本上升會影響生產者的生產意欲，屬於需求 (D) 還是 供應 (S) 的變動因素？",
+                topic: "生產成本與供應關係"
+            },
+            {
+                id: 2,
+                tag: "考點: 互補品/輔助品 (Complements)",
+                title: "2. 咖啡與「咖啡奶精」",
+                desc: "由於全球咖啡豆豐收，咖啡價格顯著下跌。對於作為咖啡互補品（輔助品）的「咖啡奶精」市場會產生什麼影響？",
+                correctAction: "D_RIGHT",
+                hint: "咖啡變便宜了 ➔ 咖啡需求量增加 ➔ 大家會多喝咖啡，那對「咖啡奶精」的需求會增加還是減少？",
+                topic: "互補品 (Complements) 價格變動"
+            },
+            {
+                id: 3,
+                tag: "考點: 替代品 (Substitutes)",
+                title: "3. 牛肉價格上升對「豬肉」市場",
+                desc: "由於進口受阻，牛肉價格大幅暴漲。在市民眼中牛肉與豬肉為替代品，這會如何影響「豬肉」市場？",
+                correctAction: "D_RIGHT",
+                hint: "牛肉變貴 ➔ 消費者轉為購買替代品（豬肉） ➔ 豬肉的購買需求會發生什麼變化？",
+                topic: "替代品 (Substitutes) 價格變動"
+            },
+            {
+                id: 4,
+                tag: "考點: 生產技術突破 (Technology)",
+                title: "4. 太陽能板生產技術突破",
+                desc: "科技巨頭發明了全新自動化技術，使太陽能板的生產效率提高雙倍且成本大降。太陽能板市場會出現什麼變動？",
+                correctAction: "S_RIGHT",
+                hint: "技術進步 (Technological Advancement) 能使廠商在相同成本下生產更多，這會使哪一條曲線向右移動？",
+                topic: "生產技術與供應"
+            },
+            {
+                id: 5,
+                tag: "考點: 所得與常規物品 (Income & Normal Goods)",
+                title: "5. 全民發放電子消費券",
+                desc: "政府向全港居民發放 $10,000 電子消費券，市民市民可支配收入增加。對「常規物品 (Normal Goods)」市場有何影響？",
+                correctAction: "D_RIGHT",
+                hint: "常規物品的定義：當收入 (Income) 增加時，對該物品的買意（需求）會上升還是下降？",
+                topic: "收入變動對常規物品之影響"
+            },
+            {
+                id: 6,
+                tag: "考點: 未來價格預期 (Price Expectation)",
+                title: "6. 樓市未來價格預期",
+                desc: "傳媒廣泛報道，市場普遍預期下個月住宅樓價將會大幅上升。這對「現時」的住宅樓市需求有何影響？",
+                correctAction: "D_RIGHT",
+                hint: "預期未來變貴 ➔ 買家會想「趁現在還便宜趕緊買」 ➔ 現時的需求 (D) 會增加還是減少？",
+                topic: "買家未來價格預期"
+            },
+            {
+                id: 7,
+                tag: "考點: 生產補貼 (Subsidy)",
+                title: "7. 政府發放電動車生產補貼",
+                desc: "為推動環保，政府向每一輛生產的電動車提供 $20,000 的現金補貼 (Subsidy)。電動車市場會出現什麼變動？",
+                correctAction: "S_RIGHT",
+                hint: "補貼相當於「負成本」(Negative Cost)，降低了廠商的實際生產負擔。供應曲線 (S) 會如何移動？",
+                topic: "政府政策：生產補貼"
+            },
+            {
+                id: 8,
+                tag: "考點: 5** 終極高階題 (Combined Shift)",
+                title: "8. 汽油進口稅上升 + 汽車出行需求急增",
+                desc: "政府大幅提高汽油進口稅 (S左移)，同時旅遊復甦導致汽車出行及汽油需求急增 (D右移)。對汽油均衡價格 P* 有何必然影響？",
+                correctAction: "D_RIGHT", // Primary focus on Demand Shift logic test or combined shift direction
+                hint: "【5** 高階啟發】：D 右移會推高價格，S 左移也會推高價格！兩者同時發生時，均衡價格 (P*) 必然大幅上升！請選擇導致價格上升的需求變動或供應變動方向（本題核心驗證需求增加與供應減少的共同作用）。",
+                topic: "複合移位與均衡點 (Combined Shift)"
+            }
+        ];
+
+        /* --------------------------------------------------
+         * GAME STATE VARIABLES
+         * -------------------------------------------------- */
+        let currentQIndex = 0;
+        let score = 0;
+        let timer = 60.0;
+        let timerInterval = null;
+        let hasAnswered = false;
+        let userAnswers = [];
+
+        // Animation state for canvas graph shift
+        let animProgress = 0.0;
+        let isAnimating = false;
+        let targetShift = { type: '', direction: 0 }; // e.g. { type: 'D', direction: 1 }
+
+        /* --------------------------------------------------
+         * START GAME HANDLER (100% Reliable non-blocking)
+         * -------------------------------------------------- */
+        function handleStartGame() {
+            // 1. Initialize audio non-blockingly
+            initAudio();
+            startBGM();
+
+            // 2. Hide Cover, Show Game Screen
+            document.getElementById('coverScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+
+            // 3. Reset State & Load First Question
+            currentQIndex = 0;
+            score = 0;
+            userAnswers = [];
+            
+            loadQuestion(currentQIndex);
+            
+            // 4. Force Canvas Resize & Initial Render
+            setTimeout(() => {
+                resizeCanvas();
+            }, 50);
+        }
+
+        /* --------------------------------------------------
+         * QUESTION LOGIC & TIMER
+         * -------------------------------------------------- */
+        function loadQuestion(index) {
+            hasAnswered = false;
+            animProgress = 0.0;
+            isAnimating = false;
+            targetShift = { type: '', direction: 0 };
+
+            const q = questions[index];
+            document.getElementById('qProgress').innerText = `${index + 1} / ${questions.length}`;
+            document.getElementById('scoreDisplay').innerText = score;
+            document.getElementById('qTag').innerText = q.tag;
+            document.getElementById('qTitle').innerText = q.title;
+            document.getElementById('qDesc').innerText = q.desc;
+            
+            // Hide hint and feedback
+            document.getElementById('hintBox').classList.add('hidden');
+            document.getElementById('feedbackCard').classList.add('hidden');
+
+            // Enable buttons
+            toggleActionButtons(true);
+
+            // Reset legend
+            document.getElementById('canvasLegend').innerText = "初始狀態：D1 與 S1 處於均衡點 E1 (等待作答)";
+            document.getElementById('canvasLegend').className = "text-center text-xs text-slate-400 mt-2 font-mono";
+
+            // Draw Initial Graph state (No shift preview beforehand!)
+            drawGraph(0, '', 0);
+
+            // Start 60s Timer
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timer = 60.0;
+            updateTimerUI();
+
+            const startTime = Date.now();
+            timerInterval = setInterval(() => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                timer = Math.max(0, 60.0 - elapsed);
+                updateTimerUI();
+
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    if (!hasAnswered) {
+                        handleTimeOut();
+                    }
+                }
+            }, 50);
+        }
+
+        function updateTimerUI() {
+            document.getElementById('timerDisplay').innerText = timer.toFixed(1) + 's';
+            const pct = (timer / 60.0) * 100;
+            const bar = document.getElementById('timerBar');
+            bar.style.width = pct + '%';
+            
+            if (pct < 25) {
+                bar.className = "h-full bg-pink-500 rounded-full transition-all duration-100 ease-linear w-full";
+            } else {
+                bar.className = "h-full bg-gradient-to-r from-cyan-400 to-amber-400 rounded-full transition-all duration-100 ease-linear w-full";
+            }
+        }
+
+        function showHint() {
+            playSFX('hint');
+            const q = questions[currentQIndex];
+            document.getElementById('hintText').innerText = q.hint;
+            document.getElementById('hintBox').classList.remove('hidden');
+        }
+
+        function toggleActionButtons(enabled) {
+            const btns = ['btnDRight', 'btnDLeft', 'btnSRight', 'btnSLeft'];
+            btns.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.disabled = !enabled;
+                if (enabled) {
+                    btn.classList.remove('opacity-40', 'cursor-not-allowed');
+                } else {
+                    btn.classList.add('opacity-40', 'cursor-not-allowed');
+                }
+            });
+        }
+
+        /* --------------------------------------------------
+         * ANSWER HANDLING & GRAPH ANIMATION
+         * -------------------------------------------------- */
+        function handleAnswer(selectedAction) {
+            if (hasAnswered) return;
+            hasAnswered = true;
+            clearInterval(timerInterval);
+
+            const q = questions[currentQIndex];
+            const isCorrect = (selectedAction === q.correctAction) || (q.id === 8 && (selectedAction === 'D_RIGHT' || selectedAction === 'S_LEFT'));
+
+            // Store user performance
+            userAnswers.push({
+                questionId: q.id,
+                topic: q.topic,
+                isCorrect: isCorrect,
+                selected: selectedAction,
+                correct: q.correctAction
+            });
+
+            // Disable buttons
+            toggleActionButtons(false);
+
+            // Audio & Score
+            if (isCorrect) {
+                playSFX('correct');
+                const speedBonus = Math.round(timer * 2);
+                const qScore = 100 + speedBonus;
+                score += qScore;
+                document.getElementById('scoreDisplay').innerText = score;
+
+                showFeedback(true, `✨ 正確！答對 +100 分 (速度加分 +${speedBonus})`);
+            } else {
+                playSFX('wrong');
+                showFeedback(false, `❌ 答錯了！正確答案應為：${getActionLabel(q.correctAction)}`);
+            }
+
+            // Setup and Trigger Curve Shift Animation AFTER answering
+            const actionToShift = isCorrect ? selectedAction : q.correctAction;
+            setupCurveAnimation(actionToShift);
+        }
+
+        function handleTimeOut() {
+            hasAnswered = true;
+            playSFX('wrong');
+            toggleActionButtons(false);
+            const q = questions[currentQIndex];
+
+            userAnswers.push({
+                questionId: q.id,
+                topic: q.topic,
+                isCorrect: false,
+                selected: 'TIMEOUT',
+                correct: q.correctAction
+            });
+
+            showFeedback(false, `⏰ 時間到！正確答案應為：${getActionLabel(q.correctAction)}`);
+            setupCurveAnimation(q.correctAction);
+        }
+
+        function getActionLabel(action) {
+            switch(action) {
+                case 'D_RIGHT': return '需求增加 (D 右移)';
+                case 'D_LEFT': return '需求減少 (D 左移)';
+                case 'S_RIGHT': return '供應增加 (S 右移)';
+                case 'S_LEFT': return '供應減少 (S 左移)';
+                default: return '';
+            }
+        }
+
+        function showFeedback(isCorrect, text) {
+            const fbCard = document.getElementById('feedbackCard');
+            const fbText = document.getElementById('feedbackText');
+            fbCard.classList.remove('hidden', 'bg-emerald-950/80', 'border-emerald-500', 'text-emerald-300', 'bg-pink-950/80', 'border-pink-500', 'text-pink-300');
+
+            if (isCorrect) {
+                fbCard.classList.add('bg-emerald-950/80', 'border', 'border-emerald-500/50', 'text-emerald-300');
+            } else {
+                fbCard.classList.add('bg-pink-950/80', 'border', 'border-pink-500/50', 'text-pink-300');
+            }
+
+            fbText.innerText = text;
+        }
+
+        function setupCurveAnimation(action) {
+            let curveType = 'D';
+            let dir = 1; // 1 for right, -1 for left
+
+            if (action === 'D_RIGHT') { curveType = 'D'; dir = 1; }
+            else if (action === 'D_LEFT') { curveType = 'D'; dir = -1; }
+            else if (action === 'S_RIGHT') { curveType = 'S'; dir = 1; }
+            else if (action === 'S_LEFT') { curveType = 'S'; dir = -1; }
+
+            targetShift = { type: curveType, direction: dir };
+            animProgress = 0.0;
+            isAnimating = true;
+
+            document.getElementById('canvasLegend').innerText = `動態移位中：${curveType} 線向 ${dir > 0 ? '右' : '左'} 移動 ➔ 形成新均衡點 E2`;
+            document.getElementById('canvasLegend').className = "text-center text-xs text-cyan-300 mt-2 font-mono font-bold animate-pulse";
+
+            animateCurve();
+        }
+
+        function animateCurve() {
+            if (!isAnimating) return;
+            animProgress += 0.04;
+            if (animProgress >= 1.0) {
+                animProgress = 1.0;
+                isAnimating = false;
+            }
+
+            drawGraph(animProgress, targetShift.type, targetShift.direction);
+
+            if (isAnimating) {
+                requestAnimationFrame(animateCurve);
+            }
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                loadQuestion(currentQIndex);
+            } else {
+                showResultScreen();
+            }
+        }
+
+        /* --------------------------------------------------
+         * CANVAS DEMAND & SUPPLY GRAPH DRAWING ENGINE
+         * -------------------------------------------------- */
+        const canvas = document.getElementById('marketCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth * window.devicePixelRatio || 400;
+            canvas.height = container.clientHeight * window.devicePixelRatio || 300;
+            drawGraph(animProgress, targetShift.type, targetShift.direction);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function drawGraph(progress, shiftType, shiftDir) {
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            // Clear background
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, w, h);
+
+            // Margin & Axes
+            const margin = { top: 30, right: 30, bottom: 40, left: 45 };
+            const graphW = w - margin.left - margin.right;
+            const graphH = h - margin.top - margin.bottom;
+
+            // Draw grid lines
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 4; i++) {
+                // Horizontal grid
+                const y = margin.top + (graphH / 5) * i;
+                ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(w - margin.right, y); ctx.stroke();
+                // Vertical grid
+                const x = margin.left + (graphW / 5) * i;
+                ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, h - margin.bottom); ctx.stroke();
+            }
+
+            // Draw Axes
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2 * (w / 400);
+            ctx.beginPath();
+            ctx.moveTo(margin.left, margin.top);
+            ctx.lineTo(margin.left, h - margin.bottom);
+            ctx.lineTo(w - margin.right, h - margin.bottom);
+            ctx.stroke();
+
+            // Axis Labels (P and Q)
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = `bold ${Math.max(12, Math.round(w / 30))}px Orbitron, sans-serif`;
+            ctx.fillText('P (價格)', margin.left - 35, margin.top + 10);
+            ctx.fillText('Q (數量)', w - margin.right - 40, h - margin.bottom + 30);
+
+            // Base Curves Coordinates
+            // D1: Downward sloping line from (0.1, 0.1) to (0.9, 0.9)
+            // S1: Upward sloping line from (0.1, 0.9) to (0.9, 0.1)
+            const d1_start = { x: margin.left + graphW * 0.15, y: margin.top + graphH * 0.15 };
+            const d1_end   = { x: margin.left + graphW * 0.85, y: margin.top + graphH * 0.85 };
+
+            const s1_start = { x: margin.left + graphW * 0.15, y: margin.top + graphH * 0.85 };
+            const s1_end   = { x: margin.left + graphW * 0.85, y: margin.top + graphH * 0.15 };
+
+            // Draw Base Curve D1
+            ctx.strokeStyle = '#06b6d4'; // Cyan for Demand
+            ctx.lineWidth = 3 * (w / 400);
+            ctx.beginPath();
+            ctx.moveTo(d1_start.x, d1_start.y);
+            ctx.lineTo(d1_end.x, d1_end.y);
+            ctx.stroke();
+
+            // Label D1
+            ctx.fillStyle = '#06b6d4';
+            ctx.fillText('D1', d1_end.x + 5, d1_end.y + 5);
+
+            // Draw Base Curve S1
+            ctx.strokeStyle = '#ec4899'; // Pink for Supply
+            ctx.lineWidth = 3 * (w / 400);
+            ctx.beginPath();
+            ctx.moveTo(s1_start.x, s1_start.y);
+            ctx.lineTo(s1_end.x, s1_end.y);
+            ctx.stroke();
+
+            // Label S1
+            ctx.fillStyle = '#ec4899';
+            ctx.fillText('S1', s1_end.x + 5, s1_end.y - 5);
+
+            // Initial Equilibrium E1 (Intersection of D1 and S1)
+            const e1 = { x: margin.left + graphW * 0.5, y: margin.top + graphH * 0.5 };
+            
+            // Draw Equilibrium E1 point
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(e1.x, e1.y, 5 * (w / 400), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillText('E1', e1.x - 15, e1.y - 10);
+
+            // Shift Animation Calculations
+            if (progress > 0 && shiftType !== '') {
+                const shiftDist = graphW * 0.22 * progress * shiftDir;
+
+                let e2 = { ...e1 };
+
+                if (shiftType === 'D') {
+                    // Shifted D2
+                    const d2_start = { x: d1_start.x + shiftDist, y: d1_start.y };
+                    const d2_end   = { x: d1_end.x + shiftDist, y: d1_end.y };
+
+                    ctx.strokeStyle = '#22d3ee';
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(d2_start.x, d2_start.y);
+                    ctx.lineTo(d2_end.x, d2_end.y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.fillStyle = '#22d3ee';
+                    ctx.fillText('D2', d2_end.x + 5, d2_end.y + 5);
+
+                    // E2 calculation for D shift
+                    e2.x = e1.x + shiftDist / 2;
+                    e2.y = e1.y - shiftDist / 2;
+
+                    // Draw Shift Arrow
+                    drawArrow(ctx, d1_start.x + graphW*0.2, d1_start.y + graphH*0.2, d1_start.x + graphW*0.2 + shiftDist, d1_start.y + graphH*0.2, '#06b6d4');
+
+                } else if (shiftType === 'S') {
+                    // Shifted S2
+                    const s2_start = { x: s1_start.x + shiftDist, y: s1_start.y };
+                    const s2_end   = { x: s1_end.x + shiftDist, y: s1_end.y };
+
+                    ctx.strokeStyle = '#f472b6';
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(s2_start.x, s2_start.y);
+                    ctx.lineTo(s2_end.x, s2_end.y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.fillStyle = '#f472b6';
+                    ctx.fillText('S2', s2_end.x + 5, s2_end.y - 5);
+
+                    // E2 calculation for S shift
+                    e2.x = e1.x + shiftDist / 2;
+                    e2.y = e1.y + shiftDist / 2;
+
+                    // Draw Shift Arrow
+                    drawArrow(ctx, s1_start.x + graphW*0.2, s1_start.y - graphH*0.2, s1_start.x + graphW*0.2 + shiftDist, s1_start.y - graphH*0.2, '#ec4899');
+                }
+
+                // Draw New Equilibrium E2 Point
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(e2.x, e2.y, 6 * (w / 400), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillText('E2', e2.x + 10, e2.y - 10);
+
+                // Dashed Equilibrium Price & Quantity Lines for E2
+                ctx.strokeStyle = '#64748b';
+                ctx.setLineDash([3, 3]);
+                // P* line
+                ctx.beginPath(); ctx.moveTo(margin.left, e2.y); ctx.lineTo(e2.x, e2.y); ctx.stroke();
+                // Q* line
+                ctx.beginPath(); ctx.moveTo(e2.x, h - margin.bottom); ctx.lineTo(e2.x, e2.y); ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        // Helper function to draw directional arrows
+        function drawArrow(context, fromx, fromy, tox, toy, color) {
+            const headlen = 8;
+            const dx = tox - fromx;
+            const dy = toy - fromy;
+            const angle = Math.atan2(dy, dx);
+            context.strokeStyle = color;
+            context.fillStyle = color;
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(fromx, fromy);
+            context.lineTo(tox, toy);
+            context.stroke();
+            context.beginPath();
+            context.moveTo(tox, toy);
+            context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+            context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+            context.lineTo(tox, toy);
+            context.fill();
+        }
+
+        /* --------------------------------------------------
+         * DIAGNOSTIC REPORT & GAME OVER
+         * -------------------------------------------------- */
+        function showResultScreen() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            document.getElementById('finalScore').innerText = `${score} pts`;
+
+            // Calculate Grade Level
+            let grade = 'Level 1';
+            if (score >= 900) grade = 'Level 5**';
+            else if (score >= 750) grade = 'Level 5*';
+            else if (score >= 600) grade = 'Level 5';
+            else if (score >= 480) grade = 'Level 4';
+            else if (score >= 350) grade = 'Level 3';
+            else if (score >= 200) grade = 'Level 2';
+
+            document.getElementById('finalGrade').innerText = grade;
+
+            // Generate Weakness Analysis List
+            const analysisList = document.getElementById('analysisList');
+            analysisList.innerHTML = '';
+
+            const wrongTopics = userAnswers.filter(a => !a.isCorrect);
+
+            if (wrongTopics.length === 0) {
+                analysisList.innerHTML = `
+                    <li class="text-emerald-400 font-bold">🎉 太強了！答對全部 8 條題型，對 DSE 需求與供應的概念掌握極度精準！5** 非你莫屬！</li>
+                    <li>建議：保持作答速度，Paper 1 多做歷屆 MC 試題以鞏固「複合移位 (Combined Shift)」題目。</li>
+                `;
+            } else {
+                wrongTopics.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="text-pink-400 font-semibold">[需要加強]: ${item.topic}</span> — 建議重溫課本有關 ${item.topic} 的圖解移位邏輯。`;
+                    analysisList.appendChild(li);
+                });
+
+                const tipLi = document.createElement('li');
+                tipLi.className = "text-amber-300 font-semibold mt-2";
+                tipLi.innerText = "💡 朱sir 溫馨提示：DSE Paper 1 的經典陷阱是分不清「需求量變動 (Change in Demand Quantity)」與「需求變動 (Change in Demand)」。自身價格變動只會造成「沿著曲線移動」！";
+                analysisList.appendChild(tipLi);
+            }
+        }
+
+        function restartGame() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('coverScreen').classList.remove('hidden');
+        }
+
+        /* --------------------------------------------------
+         * BACKGROUND PARTICLES CANVAS
+         * -------------------------------------------------- */
+        (function initBgParticles() {
+            const pCanvas = document.getElementById('particleCanvas');
+            const pCtx = pCanvas.getContext('2d');
+            let particles = [];
+
+            function resizePCanvas() {
+                pCanvas.width = window.innerWidth;
+                pCanvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizePCanvas);
+            resizePCanvas();
+
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * pCanvas.width,
+                    y: Math.random() * pCanvas.height,
+                    radius: Math.random() * 2 + 1,
+                    color: Math.random() > 0.5 ? '#06b6d4' : '#ec4899',
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    alpha: Math.random() * 0.5 + 0.2
+                });
+            }
+
+            function animateParticles() {
+                pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0) p.x = pCanvas.width;
+                    if (p.x > pCanvas.width) p.x = 0;
+                    if (p.y < 0) p.y = pCanvas.height;
+                    if (p.y > pCanvas.height) p.y = 0;
+
+                    pCtx.globalAlpha = p.alpha;
+                    pCtx.fillStyle = p.color;
+                    pCtx.beginPath();
+                    pCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    pCtx.fill();
+                });
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+        })();
+    </script>
+</body>
+</html>
